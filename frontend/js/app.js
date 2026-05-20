@@ -1198,6 +1198,7 @@ class BookRenderer {
             })();
         }
     }
+    }
 
     async exploreBookMood(title, author) {
         const cacheKey = `${title.toLowerCase().trim()}|${(author || '').toLowerCase().trim()}`;
@@ -1372,7 +1373,8 @@ class BookRenderer {
                 } else {
                     showError(`Failed to fetch mood analysis (Server error: ${res.status}).`);
                 }
-} catch (err) {
+            }
+        } catch (err) {
             console.error('Failed to explore book mood:', err);
             showError('Network error connecting to mood analysis service.');
         }
