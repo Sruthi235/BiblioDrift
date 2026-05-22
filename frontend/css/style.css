@@ -71,10 +71,9 @@
     --input-border: rgba(255, 255, 255, 0.1);
     --book-bg: #2c2420;
     --paper-color: #e0d5cb;
-    <<<<<<< HEAD
     /* Overrides */
     --shadow-hover: 0 15px 45px rgba(0, 0, 0, 0.5);
-    =======--nav-active-color: #fff2df;
+    --nav-active-color: #fff2df;
     --nav-active-ring: rgba(255, 242, 223, 0.22);
     --surface-panel: rgba(19, 16, 14, 0.74);
     --surface-elevated: rgba(34, 28, 25, 0.92);
@@ -82,7 +81,6 @@
     --control-border: rgba(255, 255, 255, 0.1);
     --control-focus-ring: rgba(252, 203, 78, 0.24);
     --control-hover: rgba(255, 255, 255, 0.1);
-    >>>>>>>upstream/main
 }
 
 * {
@@ -233,34 +231,23 @@ header {
 
 .nav-links {
     display: flex;
-    <<<<<<< HEAD flex-wrap: wrap;
+    flex-wrap: wrap;
     gap: 1rem 2rem;
     align-items: center;
-    =======align-items: center;
-    gap: 2rem;
-    >>>>>>>upstream/main
 }
 
 .nav-links a {
     text-decoration: none;
     color: var(--text-muted);
-    <<<<<<< HEAD transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
+    transition: color 0.3s ease, border-color 0.3s ease, font-weight 0.3s ease;
     display: inline-block;
     border-bottom: 4px solid transparent;
     padding-bottom: 8px;
-    =======position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 30px;
-    padding-bottom: 10px;
-    transition: color 0.25s ease;
-    >>>>>>>upstream/main
 }
 
 .nav-links a:hover,
 .nav-links a.active {
-    <<<<<<< HEAD color: var(--text-main);
+    color: var(--text-main);
     font-weight: 800;
     border-bottom-color: var(--accent-gold);
 }
@@ -270,33 +257,6 @@ header {
     border-bottom-color: transparent;
     color: var(--text-muted);
     font-weight: normal;
-    =======color: var(--nav-active-color);
-}
-
-.nav-links a::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--nav-active-color);
-    box-shadow: 0 0 0 3px var(--nav-active-ring);
-    opacity: 0;
-    transform: translateX(-50%) scale(0.35);
-    transition: opacity 0.22s ease, transform 0.22s ease;
-}
-
-.nav-links a:hover::after {
-    opacity: 0.45;
-    transform: translateX(-50%) scale(0.75);
-}
-
-.nav-links a.active::after {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-    >>>>>>>upstream/main
 }
 
 /* === ANIMATED HOVER TOOLTIPS FOR NAVIGATION (NEW) === */
