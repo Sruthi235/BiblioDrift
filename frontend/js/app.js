@@ -1845,13 +1845,38 @@ class LibraryManager {
         // 1. Request persistent storage to prevent wipes
         await SafeStorage.requestPersistence();
 
-        // 2. Load from LocalStorage or IndexedDB backup (Issue #8)
-        const stored = await SafeStorage.getAsync(this.storageKey);
-        if (stored) {
+        const user = this.getUser();
+        let storedLibrary = null;
+
+        // 2. Load from Dexie IndexedDB (Issue #875)
+        if (user && window.db?.userLibrary) {
             try {
-                this.library = JSON.parse(stored);
+                const record = await window.db.userLibrary.get(user.id);
+                if (record && record.library) {
+                    storedLibrary = record.library;
+                }
             } catch (e) {
-                console.error("[Library] Failed to parse stored library, resetting to empty.", e);
+                console.error("[Library] Failed to read from Dexie", e);
+            }
+        }
+
+        // Fallback to SafeStorage for migration
+        if (!storedLibrary) {
+            const stored = await SafeStorage.getAsync(this.storageKey);
+            if (stored) {
+                try {
+                    storedLibrary = JSON.parse(stored);
+                } catch (e) {
+                    console.error("[Library] Failed to parse stored library, resetting to empty.", e);
+                }
+            }
+        }
+
+        if (storedLibrary) {
+            this.library = storedLibrary;
+            // Migrate to Dexie immediately
+            if (user && window.db?.userLibrary) {
+                window.db.userLibrary.put({ userId: user.id, library: this.library }).catch(e => console.error(e));
             }
         }
 
@@ -1865,12 +1890,27 @@ class LibraryManager {
             this.renderShelf('finished', 'shelf-finished');
         }
 
-        // 4. Sync with backend if available (Full Refresh)
-        await this.syncWithBackend();
-        if (navigator.onLine) {
-            await this.flushPendingLibraryMutations();
+        // 4. Sync with backend if available (Background Refresh)
+        if (!storedLibrary) {
+            await this.syncWithBackend();
+            if (navigator.onLine) {
+                await this.flushPendingLibraryMutations();
+            }
+            await this.updateSyncStatus();
+        } else {
+            // Background sync (stale-while-revalidate strategy)
+            (async () => {
+                try {
+                    await this.syncWithBackend();
+                    if (navigator.onLine) {
+                        await this.flushPendingLibraryMutations();
+                    }
+                    await this.updateSyncStatus();
+                } catch (e) {
+                    console.error("[Library] Background sync failed", e);
+                }
+            })();
         }
-        await this.updateSyncStatus();
     }
 
     getUser() {
@@ -2603,6 +2643,10 @@ class LibraryManager {
     }
 
     saveLocally() {
+        const user = this.getUser();
+        if (user && window.db?.userLibrary) {
+            window.db.userLibrary.put({ userId: user.id, library: this.library }).catch(e => console.error(e));
+        }
         SafeStorage.set(this.storageKey, JSON.stringify(this.library));
     }
 
